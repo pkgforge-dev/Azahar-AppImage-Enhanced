@@ -1,11 +1,11 @@
-name: Build Azahar (Stable)
+name: Appimage
 concurrency:
-  group: build-stable-${{ github.ref }}
+  group: build-${{ github.ref }}
   cancel-in-progress: true
 
 on:
   schedule:
-    - cron: "0 14 * * 0"
+    - cron: "0 7 1/14 * *"
   workflow_dispatch: {}
 
 jobs:
