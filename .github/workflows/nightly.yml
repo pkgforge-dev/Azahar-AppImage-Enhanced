@@ -1,11 +1,11 @@
-name: Appimage
+name: Appimage (Nightly)
 concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: true
 
 on:
   schedule:
-    - cron: "0 7 1/14 * *"
+    - cron: "0 7 1/3 * *"
   workflow_dispatch: {}
 
 jobs:
@@ -23,10 +23,10 @@ jobs:
             optimized: true
             name: "Azahar Build (Optimized)"
             arch: x86_64
-#          - runs-on: ubuntu-24.04-arm
-#            name: "Azahar build"
-#            optimized: false
-#            arch: aarch64
+          - runs-on: ubuntu-24.04-arm
+            name: "Azahar build"
+            optimized: false
+            arch: aarch64
     container: ghcr.io/pkgforge-dev/archlinux:latest
     steps:
       - uses: actions/checkout@v4
@@ -40,6 +40,7 @@ jobs:
       - name: Compile Azahar (Normal)
         if: ${{ matrix.optimized == false }}
         run: |
+          export DEVEL=true
           chmod +x ./azahar-appimage.sh && ./azahar-appimage.sh
           mkdir -p dist
           mv *.AppImage* dist/
@@ -47,6 +48,7 @@ jobs:
       - name: Compile Azahar (Optimized)
         if: ${{ matrix.optimized == true }}
         run: |
+          export DEVEL=true
           chmod +x ./azahar-appimage.sh && ./azahar-appimage.sh v3
           mkdir -p dist
           mv *.AppImage* dist/
@@ -87,9 +89,9 @@ jobs:
         with:
           name: azahar-normal-appimage-x86_64
 
-#      - uses: actions/download-artifact@v4.3.0
-#        with:
-#          name: azahar-normal-appimage-aarch64
+      - uses: actions/download-artifact@v4.3.0
+        with:
+          name: azahar-normal-appimage-aarch64
 
       - uses: actions/download-artifact@v4.3.0
         with:
@@ -104,7 +106,7 @@ jobs:
 
       - name: Del Previous Release
         run: |
-          gh release delete "${APP_VERSION}" --repo "${GITHUB_REPOSITORY}" --cleanup-tag  -y
+          gh release delete "nightly" --repo "${GITHUB_REPOSITORY}" --cleanup-tag  -y
           sleep 5
         env:
           GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
@@ -113,23 +115,11 @@ jobs:
       - name: Continuous Releaser
         uses: softprops/action-gh-release@v2
         with:
-          name: "Azahar AppImage ${{ env.APP_VERSION }}"
+          name: "Azahar AppImage Nightly ${{ env.APP_VERSION }}"
           tag_name: "${{ env.APP_VERSION }}"
-          prerelease: false
+          prerelease: true
           draft: false
           generate_release_notes: false
           make_latest: true
-          files: |
-            *.AppImage*
-
-      - name: Snapshot Releaser
-        uses: softprops/action-gh-release@v2
-        with:
-          name: "Snapshot ${{ env.APP_VERSION }}"
-          tag_name: "${{ env.SNAPSHOT_TAG }}"
-          prerelease: false
-          draft: false
-          generate_release_notes: false
-          make_latest: false
           files: |
             *.AppImage*

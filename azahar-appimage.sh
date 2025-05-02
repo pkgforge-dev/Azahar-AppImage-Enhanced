@@ -46,10 +46,13 @@ echo "$VERSION" > ~/version
 	cd ./azahar
 	git submodule update --init --recursive -j$(nproc)
 
+	# HACK
+	sed -i '10a #include <memory>' ./src/video_core/shader/shader_jit_a64_compiler.*
+
 	mkdir ./build
 	cd ./build
-	cmake .. -DCMAKE_CXX_COMPILER=g++ \
-		-DCMAKE_C_COMPILER=gcc \
+	cmake .. -DCMAKE_CXX_COMPILER=clang++ \
+		-DCMAKE_C_COMPILER=clang \
 		-DCMAKE_INSTALL_PREFIX=/usr \
 		-DENABLE_QT_TRANSLATION=ON \
 		-DUSE_SYSTEM_BOOST=OFF \
