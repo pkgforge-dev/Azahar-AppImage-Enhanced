@@ -14,14 +14,14 @@ if [ "$ARCH" = 'x86_64' ]; then
 	if [ "$1" = 'v3' ]; then
 		echo "Making x86-64-v3 optimized build of azahar..."
 		ARCH="${ARCH}_v3"
-		ARCH_FLAGS="-march=x86-64-v3 -O3 -flto=auto -DNDEBUG"
+		ARCH_FLAGS="-march=x86-64-v3 -O3 -flto=thin -DNDEBUG"
 	else
 		echo "Making x86-64 generic build of azahar..."
-		ARCH_FLAGS="-march=x86-64 -mtune=generic -O3 -flto=auto -DNDEBUG"
+		ARCH_FLAGS="-march=x86-64 -mtune=generic -O3 -flto=thin -DNDEBUG"
 	fi
 else
 	echo "Making aarch64 build of azahar..."
-	ARCH_FLAGS="-march=armv8-a -mtune=generic -O3 -flto=auto -DNDEBUG"
+	ARCH_FLAGS="-march=armv8-a -mtune=generic -O3 -flto=thin -DNDEBUG"
 fi
 
 UPINFO="gh-releases-zsync|$(echo "$GITHUB_REPOSITORY" | tr '/' '|')|latest|*$ARCH.AppImage.zsync"
@@ -51,8 +51,8 @@ echo "$VERSION" > ~/version
 
 	mkdir ./build
 	cd ./build
-	cmake .. -DCMAKE_CXX_COMPILER=g++ \
-		-DCMAKE_C_COMPILER=gcc \
+	cmake .. -DCMAKE_CXX_COMPILER=clang++ \
+		-DCMAKE_C_COMPILER=clang \
 		-DCMAKE_INSTALL_PREFIX=/usr \
 		-DENABLE_QT_TRANSLATION=ON \
 		-DUSE_SYSTEM_BOOST=OFF \
