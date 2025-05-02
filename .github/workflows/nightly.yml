@@ -1,6 +1,6 @@
-name: Build Azahar (Nightly)
+name: Appimage
 concurrency:
-  group: build-nightly-${{ github.ref }}
+  group: build-${{ github.ref }}
   cancel-in-progress: true
 
 on:
