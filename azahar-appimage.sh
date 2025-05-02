@@ -46,6 +46,9 @@ echo "$VERSION" > ~/version
 	cd ./azahar
 	git submodule update --init --recursive -j$(nproc)
 
+	# HACK
+	sed -i '10a #include <memory>' ./src/video_core/shader/shader_jit_a64_compiler.*
+
 	mkdir ./build
 	cd ./build
 	cmake .. -DCMAKE_CXX_COMPILER=g++ \
