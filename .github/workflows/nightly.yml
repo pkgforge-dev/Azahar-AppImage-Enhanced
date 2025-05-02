@@ -1,6 +1,6 @@
 name: Build Azahar (Nightly)
 concurrency:
-  group: build-stable-${{ github.ref }}
+  group: build-nightly-${{ github.ref }}
   cancel-in-progress: true
 
 on:
