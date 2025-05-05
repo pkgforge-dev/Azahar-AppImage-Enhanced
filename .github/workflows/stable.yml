@@ -23,10 +23,10 @@ jobs:
             optimized: true
             name: "Azahar Build (Optimized)"
             arch: x86_64
-#          - runs-on: ubuntu-24.04-arm
-#            name: "Azahar build"
-#            optimized: false
-#            arch: aarch64
+          - runs-on: ubuntu-24.04-arm
+            name: "Azahar build"
+            optimized: false
+            arch: aarch64
     container: ghcr.io/pkgforge-dev/archlinux:latest
     steps:
       - uses: actions/checkout@v4
@@ -87,9 +87,9 @@ jobs:
         with:
           name: azahar-normal-appimage-x86_64
 
-#      - uses: actions/download-artifact@v4.3.0
-#        with:
-#          name: azahar-normal-appimage-aarch64
+      - uses: actions/download-artifact@v4.3.0
+        with:
+          name: azahar-normal-appimage-aarch64
 
       - uses: actions/download-artifact@v4.3.0
         with:
