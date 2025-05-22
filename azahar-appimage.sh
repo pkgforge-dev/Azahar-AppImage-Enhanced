@@ -8,17 +8,14 @@ REPO="https://github.com/azahar-emu/azahar.git"
 LIB4BN="https://raw.githubusercontent.com/VHSgunzo/sharun/refs/heads/main/lib4bin"
 GRON="https://raw.githubusercontent.com/xonixx/gron.awk/refs/heads/main/gron.awk"
 URUNTIME="https://github.com/VHSgunzo/uruntime/releases/latest/download/uruntime-appimage-dwarfs-$ARCH"
-UPINFO="gh-releases-zsync|$(echo "$GITHUB_REPOSITORY" | tr '/' '|')|latest|*$ARCH.AppImage.zsync"
 
-if [ "$ARCH" = 'x86_64' ]; then
-	if [ "$1" = 'v3' ]; then
-		echo "Making x86-64-v3 optimized build of azahar..."
-		ARCH="${ARCH}_v3"
-		ARCH_FLAGS="-march=x86-64-v3 -O3 -flto=thin -DNDEBUG"
-	else
-		echo "Making x86-64 generic build of azahar..."
-		ARCH_FLAGS="-march=x86-64 -mtune=generic -O3 -flto=thin -DNDEBUG"
-	fi
+if [ "$1" = 'v3' ] && [ "$ARCH" = 'x86_64' ]; then
+	echo "Making x86-64-v3 optimized build of azahar..."
+	ARCH="${ARCH}_v3"
+	ARCH_FLAGS="-march=x86-64-v3 -O3 -flto=thin -DNDEBUG"
+elif [ "$ARCH" = 'x86_64' ]; then
+	echo "Making x86-64 generic build of azahar..."
+	ARCH_FLAGS="-march=x86-64 -mtune=generic -O3 -flto=thin -DNDEBUG"
 else
 	echo "Making aarch64 build of azahar..."
 	ARCH_FLAGS="-march=armv8-a -mtune=generic -O3 -flto=thin -DNDEBUG"
@@ -30,22 +27,20 @@ UPINFO="gh-releases-zsync|$(echo "$GITHUB_REPOSITORY" | tr '/' '|')|latest|*$ARC
 if [ "DEVEL" = 'true' ]; then
 	echo "Making nightly build of azahar..."
 	VERSION="$(git ls-remote "$REPO" HEAD | cut -c 1-9)"
-	git clone "$REPO" ./azahar
+	git clone --recursive -j$(nproc) "$REPO" ./azahar
 else
 	echo "Making stable build of azahar..."
 	wget "$GRON" -O ./gron.awk
 	chmod +x ./gron.awk
 	VERSION=$(wget https://api.github.com/repos/azahar-emu/azahar/tags -O - \
 		| ./gron.awk | awk -F'=|"' '/name/ {print $3; exit}')
-	git clone --branch "$VERSION" --single-branch "$REPO" ./azahar
+	git clone --recursive -j$(nproc) --branch "$VERSION" --single-branch "$REPO" ./azahar
 fi
 echo "$VERSION" > ~/version
 
 # BUILD AZAAHR
 (
 	cd ./azahar
-	git submodule update --init --recursive -j$(nproc)
-
 	# HACK
 	sed -i '10a #include <memory>' ./src/video_core/shader/shader_jit_a64_compiler.*
 
@@ -90,9 +85,7 @@ wget --retry-connrefused --tries=30 "$LIB4BN" -O ./lib4bin
 chmod +x ./lib4bin
 xvfb-run -a -- ./lib4bin -p -v -e -s -k \
 	/usr/bin/azahar* \
-	/usr/lib/libGLX* \
-	/usr/lib/libGL.so* \
-	/usr/lib/libEGL* \
+	/usr/lib/lib*GL* \
 	/usr/lib/dri/* \
 	/usr/lib/vdpau/* \
 	/usr/lib/libvulkan* \
@@ -117,8 +110,8 @@ xvfb-run -a -- ./lib4bin -p -v -e -s -k \
 
 # Prepare sharun
 if [ "$ARCH" = 'aarch64' ]; then
-	# allow the host vulkan to be used for aarch64 given the sed situation
-	echo 'SHARUN_ALLOW_SYS_VKICD=1' > ./.env
+	# allow the host vulkan to be used for aarch64 given the sad situation
+	echo 'SHARUN_ALLOW_SYS_VKICD=1' >> ./.env
 fi
 ln ./sharun ./AppRun
 ./sharun -g
