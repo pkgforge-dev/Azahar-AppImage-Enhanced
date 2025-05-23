@@ -5,9 +5,9 @@ set -ex
 export ARCH="$(uname -m)"
 
 REPO="https://github.com/azahar-emu/azahar.git"
-LIB4BN="https://raw.githubusercontent.com/VHSgunzo/sharun/refs/heads/main/lib4bin"
 GRON="https://raw.githubusercontent.com/xonixx/gron.awk/refs/heads/main/gron.awk"
 URUNTIME="https://github.com/VHSgunzo/uruntime/releases/latest/download/uruntime-appimage-dwarfs-$ARCH"
+SHARUN="https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH-aio"
 
 if [ "$1" = 'v3' ] && [ "$ARCH" = 'x86_64' ]; then
 	echo "Making x86-64-v3 optimized build of azahar..."
@@ -46,21 +46,21 @@ echo "$VERSION" > ~/version
 
 	mkdir ./build
 	cd ./build
-	cmake .. -DCMAKE_CXX_COMPILER=clang++ \
-		-DCMAKE_C_COMPILER=clang \
-		-DCMAKE_INSTALL_PREFIX=/usr \
-		-DENABLE_QT_TRANSLATION=ON \
-		-DUSE_SYSTEM_BOOST=OFF \
-		-DCMAKE_BUILD_TYPE=Release \
-		-DUSE_DISCORD_PRESENCE=OFF \
-		-DCMAKE_C_FLAGS="$ARCH_FLAGS" \
-		-DUSE_SYSTEM_VULKAN_HEADERS=ON \
-		-DENABLE_LTO=OFF \
-		-DUSE_SYSTEM_GLSLANG=ON \
-		-DSIRIT_USE_SYSTEM_SPIRV_HEADERS=ON \
-		-DCITRA_USE_PRECOMPILED_HEADERS=OFF \
-		-DCMAKE_C_FLAGS="$ARCH_FLAGS" \
-		-DCMAKE_CXX_FLAGS="$ARCH_FLAGS" \
+	cmake .. -DCMAKE_CXX_COMPILER=clang++    \
+		-DCMAKE_C_COMPILER=clang             \
+		-DCMAKE_INSTALL_PREFIX=/usr          \
+		-DENABLE_QT_TRANSLATION=ON           \
+		-DUSE_SYSTEM_BOOST=OFF               \
+		-DCMAKE_BUILD_TYPE=Release           \
+		-DUSE_DISCORD_PRESENCE=OFF           \
+		-DCMAKE_C_FLAGS="$ARCH_FLAGS"        \
+		-DUSE_SYSTEM_VULKAN_HEADERS=ON       \
+		-DENABLE_LTO=OFF                     \
+		-DUSE_SYSTEM_GLSLANG=ON              \
+		-DSIRIT_USE_SYSTEM_SPIRV_HEADERS=ON  \
+		-DCITRA_USE_PRECOMPILED_HEADERS=OFF  \
+		-DCMAKE_C_FLAGS="$ARCH_FLAGS"        \
+		-DCMAKE_CXX_FLAGS="$ARCH_FLAGS"      \
 		-Wno-dev
 	cmake --build . -- -j"$(nproc)"
 	sudo make install
@@ -81,36 +81,36 @@ if [ "$DEVEL" = 'true' ]; then
 fi
 
 # Bundle all libs
-wget --retry-connrefused --tries=30 "$LIB4BN" -O ./lib4bin
-chmod +x ./lib4bin
-xvfb-run -a -- ./lib4bin -p -v -e -s -k \
-	/usr/bin/azahar* \
-	/usr/lib/lib*GL* \
-	/usr/lib/dri/* \
-	/usr/lib/vdpau/* \
-	/usr/lib/libvulkan* \
-	/usr/lib/libVkLayer* \
-	/usr/lib/libXss.so* \
-	/usr/lib/libdecor-0.so* \
-	/usr/lib/libgamemode.so* \
-	/usr/lib/qt6/plugins/audio/* \
-	/usr/lib/qt6/plugins/bearer/* \
-	/usr/lib/qt6/plugins/imageformats/* \
-	/usr/lib/qt6/plugins/iconengines/* \
-	/usr/lib/qt6/plugins/platforms/* \
-	/usr/lib/qt6/plugins/platformthemes/* \
-	/usr/lib/qt6/plugins/platforminputcontexts/* \
-	/usr/lib/qt6/plugins/styles/* \
-	/usr/lib/qt6/plugins/xcbglintegrations/* \
-	/usr/lib/qt6/plugins/wayland-*/* \
-	/usr/lib/pulseaudio/* \
-	/usr/lib/pipewire-*/* \
-	/usr/lib/spa-*/*/* \
+wget --retry-connrefused --tries=30 "$SHARUN" -O ./sharun-aio
+chmod +x ./sharun-aio
+xvfb-run -a ./sharun-aio l -p -v -e -s -k         \
+	/usr/bin/azahar*                              \
+	/usr/lib/lib*GL*                              \
+	/usr/lib/dri/*                                \
+	/usr/lib/vdpau/*                              \
+	/usr/lib/libvulkan*                           \
+	/usr/lib/libVkLayer*                          \
+	/usr/lib/libXss.so*                           \
+	/usr/lib/libdecor-0.so*                       \
+	/usr/lib/libgamemode.so*                      \
+	/usr/lib/qt6/plugins/audio/*                  \
+	/usr/lib/qt6/plugins/bearer/*                 \
+	/usr/lib/qt6/plugins/imageformats/*           \
+	/usr/lib/qt6/plugins/iconengines/*            \
+	/usr/lib/qt6/plugins/platforms/*              \
+	/usr/lib/qt6/plugins/platformthemes/*         \
+	/usr/lib/qt6/plugins/platforminputcontexts/*  \
+	/usr/lib/qt6/plugins/styles/*                 \
+	/usr/lib/qt6/plugins/xcbglintegrations/*      \
+	/usr/lib/qt6/plugins/wayland-*/*              \
+	/usr/lib/pulseaudio/*                         \
+	/usr/lib/pipewire-*/*                         \
+	/usr/lib/spa-*/*/*                            \
 	/usr/lib/alsa-lib/*
+rm -f ./sharun-aio
 
 # Prepare sharun
-if [ "$ARCH" = 'aarch64' ]; then
-	# allow the host vulkan to be used for aarch64 given the sad situation
+if [ "$ARCH" = 'aarch64' ]; then # allow using host vk for aarch64 given the sad situation
 	echo 'SHARUN_ALLOW_SYS_VKICD=1' >> ./.env
 fi
 ln ./sharun ./AppRun
@@ -126,11 +126,11 @@ echo "Adding update information \"$UPINFO\" to runtime..."
 ./uruntime --appimage-addupdinfo "$UPINFO"
 
 echo "Generating AppImage..."
-./uruntime --appimage-mkdwarfs -f \
-	--set-owner 0 --set-group 0 \
-	--no-history --no-create-timestamp \
+./uruntime --appimage-mkdwarfs -f        \
+	--set-owner 0 --set-group 0          \
+	--no-history --no-create-timestamp   \
 	--compression zstd:level=22 -S26 -B8 \
-	--header uruntime \
+	--header uruntime                    \
 	-i ./AppDir -o Azahar-Enhanced-"$VERSION"-anylinux-"$ARCH".AppImage
 
 echo "Generating zsync file..."
