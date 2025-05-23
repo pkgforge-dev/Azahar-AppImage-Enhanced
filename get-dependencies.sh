@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex
+set -eux
 
 sed -i 's/DownloadUser/#DownloadUser/g' /etc/pacman.conf
 
@@ -61,7 +61,6 @@ pacman -Syu --noconfirm \
 	ninja \
 	nlohmann-json \
 	numactl \
-	patchelf \
 	pipewire-audio \
 	pulseaudio \
 	pulseaudio-alsa \
@@ -74,7 +73,6 @@ pacman -Syu --noconfirm \
 	rapidjson \
 	sdl2 \
 	spirv-headers \
-	strace \
 	unzip \
 	vulkan-headers \
 	vulkan-mesa-layers \
@@ -99,11 +97,11 @@ fi
 
 echo "Installing debloated pckages..."
 echo "---------------------------------------------------------------"
-wget --retry-connrefused --tries=30 "$LLVM_URL" -O ./llvm-libs.pkg.tar.zst
-wget --retry-connrefused --tries=30 "$QT6_URL" -O ./qt6-base-iculess.pkg.tar.zst
-wget --retry-connrefused --tries=30 "$LIBXML_URL" -O ./libxml2-iculess.pkg.tar.zst
-wget --retry-connrefused --tries=30 "$FFMPEG_URL" -O ./ffmpeg-mini.pkg.tar.zst
-wget --retry-connrefused --tries=30 "$OPUS_URL" -O ./opus-nano.pkg.tar.zst
+wget --retry-connrefused --tries=30 "$LLVM_URL"   -O  ./llvm-libs.pkg.tar.zst
+wget --retry-connrefused --tries=30 "$QT6_URL"    -O  ./qt6-base-iculess.pkg.tar.zst
+wget --retry-connrefused --tries=30 "$LIBXML_URL" -O  ./libxml2-iculess.pkg.tar.zst
+wget --retry-connrefused --tries=30 "$FFMPEG_URL" -O  ./ffmpeg-mini.pkg.tar.zst
+wget --retry-connrefused --tries=30 "$OPUS_URL"   -O  ./opus-nano.pkg.tar.zst
 
 pacman -U --noconfirm ./*.pkg.tar.zst
 rm -f ./*.pkg.tar.zst
