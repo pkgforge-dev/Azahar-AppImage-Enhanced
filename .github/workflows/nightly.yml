@@ -73,6 +73,7 @@ jobs:
           overwrite: true
 
   release:
+    if: ${{ github.ref_name == 'main' }}
     name: "release"
     needs: [build]
     permissions:
@@ -105,9 +106,7 @@ jobs:
           echo SNAPSHOT_TAG="${SNAPSHOT_TAG}" >> "${GITHUB_ENV}"
 
       - name: Del Previous Release
-        run: |
-          gh release delete "nightly" --repo "${GITHUB_REPOSITORY}" --cleanup-tag  -y
-          sleep 5
+        run: gh release delete "nightly" --repo "${GITHUB_REPOSITORY}" --cleanup-tag -y && sleep 5
         env:
           GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         continue-on-error: true
@@ -115,7 +114,7 @@ jobs:
       - name: Continuous Releaser
         uses: softprops/action-gh-release@v2.2.2
         with:
-          name: "Azahar AppImage Nightly ${{ env.APP_VERSION }}"
+          name: "Azahar Nightly ${{ env.APP_VERSION }}"
           tag_name: "nightly"
           prerelease: true
           draft: false
