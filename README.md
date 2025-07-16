@@ -1,6 +1,13 @@
-# Azahar-AppImage-Enhanced
+# Azahar-AppImage-Enhanced 🐧
 
-Improved AppImage of Azahar **independent of the host libc** and added bonus `x86_64_v3` optimizations. 
+[![GitHub Downloads](https://img.shields.io/github/downloads/pkgforge-dev/Azahar-AppImage-Enhanced/total?logo=github&label=GitHub%20Downloads)](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced/releases/latest)
+[![CI Build Status](https://github.com//pkgforge-dev/Azahar-AppImage-Enhanced/actions/workflows/stable.yml/badge.svg)](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced/releases/latest)
+
+Improved AppImage of Azahar **independent of the host libc** and added bonus `x86_64_v3` optimizations.
+
+* [Latest Stable Release](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced/releases/latest)
+
+* [Latest Nightly Release](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced/releases/tag/nightly)
 
 Upstream Azahar refuses to follow the bare minimum suggested by the appimage spec of targetting the oldest still suppot ubuntu LTS release, which at the time of writting this is Ubuntu 20.04.
 
@@ -12,7 +19,7 @@ Upstream Azahar refuses to follow the bare minimum suggested by the appimage spe
 
 This AppImage is not only able to work on such old systems, it is able to work on ubuntu **14.04** and Alpine linux (musl). The limit here being a too old kernel and not the libc.
 
----------------------------------------------------------------------------------------
+---
 
 AppImage made using [sharun](https://github.com/VHSgunzo/sharun), which makes it extremely easy to turn any binary into a portable package without using containers or similar tricks.
 
