@@ -17,6 +17,8 @@ Upstream Azahar refuses to follow the bare minimum suggested by the appimage spe
 
 * https://github.com/azahar-emu/azahar/issues/985 wtf?!
 
+* https://github.com/azahar-emu/azahar/issues/1115
+
 This AppImage is not only able to work on such old systems, it is able to work on ubuntu **14.04** and Alpine linux (musl). The limit here being a too old kernel and not the libc.
 
 ---
