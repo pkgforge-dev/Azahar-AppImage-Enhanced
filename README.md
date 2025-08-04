@@ -9,6 +9,14 @@ Improved AppImage of Azahar **independent of the host libc** and added bonus `x8
 
 * [Latest Nightly Release](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced/releases/tag/nightly)
 
+# READ THIS IF YOU HAVE ISSUES
+
+If you are on wayland (specially GNOME wayland) and get freezes or crahes you are likely affected by this issue that affects all Qt6 apps: https://github.com/pkgforge-dev/Citron-AppImage/issues/50
+
+To fix it simply set the env variable `QT_QPA_PLATFORM=xcb`
+
+---
+
 Upstream Azahar refuses to follow the bare minimum suggested by the appimage spec of targetting the oldest still suppot ubuntu LTS release, which at the time of writting this is Ubuntu 20.04.
 
 * https://github.com/azahar-emu/azahar/issues/127#issuecomment-2292289736
@@ -45,4 +53,5 @@ This appimage works without fuse2 as it can use fuse3 instead, it can also work 
 
 ---
 
-More at: [AnyLinux-AppImages](https://pkgforge-dev.github.io/Anylinux-AppImages/) 
+More at: [AnyLinux-AppImages](https://pkgforge-dev.github.io/Anylinux-AppImages/)
+
