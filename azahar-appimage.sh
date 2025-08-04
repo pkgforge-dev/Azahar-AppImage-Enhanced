@@ -44,6 +44,9 @@ echo "$VERSION" > ~/version
 	# HACK
 	sed -i '10a #include <memory>' ./src/video_core/shader/shader_jit_a64_compiler.*
 
+	# HACK2
+	sed -i '1i find_package(SPIRV-Headers)' ./externals/sirit/sirit/src/CMakeLists.txt
+
 	mkdir ./build
 	cd ./build
 	cmake .. -DCMAKE_CXX_COMPILER=clang++    \
@@ -57,7 +60,6 @@ echo "$VERSION" > ~/version
 		-DUSE_SYSTEM_VULKAN_HEADERS=ON       \
 		-DENABLE_LTO=OFF                     \
 		-DUSE_SYSTEM_GLSLANG=ON              \
-		-DSIRIT_USE_SYSTEM_SPIRV_HEADERS=ON  \
 		-DCITRA_USE_PRECOMPILED_HEADERS=OFF  \
 		-DCMAKE_C_FLAGS="$ARCH_FLAGS"        \
 		-DCMAKE_CXX_FLAGS="$ARCH_FLAGS"      \
