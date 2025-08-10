@@ -2,12 +2,11 @@
 
 set -ex
 
-export ARCH="$(uname -m)"
-
+ARCH="$(uname -m)"
 REPO="https://github.com/azahar-emu/azahar.git"
 GRON="https://raw.githubusercontent.com/xonixx/gron.awk/refs/heads/main/gron.awk"
-URUNTIME="https://github.com/VHSgunzo/uruntime/releases/latest/download/uruntime-appimage-dwarfs-$ARCH"
-SHARUN="https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH-aio"
+URUNTIME="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
+SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
 
 if [ "$1" = 'v3' ] && [ "$ARCH" = 'x86_64' ]; then
 	echo "Making x86-64-v3 optimized build of azahar..."
@@ -20,8 +19,6 @@ else
 	echo "Making aarch64 build of azahar..."
 	ARCH_FLAGS="-march=armv8-a -mtune=generic -O3 -flto=thin -DNDEBUG"
 fi
-
-UPINFO="gh-releases-zsync|$(echo "$GITHUB_REPOSITORY" | tr '/' '|')|latest|*$ARCH.AppImage.zsync"
 
 # Determine to build nightly or stable
 if [ "DEVEL" = 'true' ]; then
@@ -37,6 +34,9 @@ else
 	git clone --recursive -j$(nproc) --branch "$VERSION" --single-branch "$REPO" ./azahar
 fi
 echo "$VERSION" > ~/version
+
+export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
+export OUTNAME=Azahar-Enhanced-"$VERSION"-anylinux-"$ARCH".AppImage
 
 # BUILD AZAAHR
 (
@@ -69,72 +69,29 @@ echo "$VERSION" > ~/version
 )
 rm -rf ./azahar
 
-# NOW MAKE APPIMAGE
+# PREPARE APPDIR
 mkdir ./AppDir
-cd ./AppDir
-
-cp -v /usr/share/applications/org.azahar_emu.Azahar.desktop            ./azahar.desktop
-cp -v /usr/share/icons/hicolor/512x512/apps/org.azahar_emu.Azahar.png  ./azahar.png
-cp -v /usr/share/icons/hicolor/512x512/apps/org.azahar_emu.Azahar.png  ./.DirIcon
-
+cp -v /usr/share/applications/org.azahar_emu.Azahar.desktop            ./AppDir/azahar.desktop
+cp -v /usr/share/icons/hicolor/512x512/apps/org.azahar_emu.Azahar.png  ./AppDir/azahar.png
+cp -v /usr/share/icons/hicolor/512x512/apps/org.azahar_emu.Azahar.png  ./AppDir/.DirIcon
 if [ "$DEVEL" = 'true' ]; then
-	sed -i 's|Name=Azahar|Name=Azahar nightly|' ./azahar.desktop
+	sed -i 's|Name=Azahar|Name=Azahar nightly|' ./AppDir/azahar.desktop
 	UPINFO="$(echo "$UPINFO" | sed 's|latest|nightly|')"
 fi
 
-# Bundle all libs
-wget --retry-connrefused --tries=30 "$SHARUN" -O ./sharun-aio
-chmod +x ./sharun-aio
-xvfb-run -a ./sharun-aio l -p -v -e -s -k         \
-	/usr/bin/azahar*                              \
-	/usr/lib/lib*GL*                              \
-	/usr/lib/dri/*                                \
-	/usr/lib/vdpau/*                              \
-	/usr/lib/libvulkan*                           \
-	/usr/lib/libVkLayer*                          \
-	/usr/lib/libXss.so*                           \
-	/usr/lib/libdecor-0.so*                       \
-	/usr/lib/libgamemode.so*                      \
-	/usr/lib/qt6/plugins/audio/*                  \
-	/usr/lib/qt6/plugins/bearer/*                 \
-	/usr/lib/qt6/plugins/imageformats/*           \
-	/usr/lib/qt6/plugins/iconengines/*            \
-	/usr/lib/qt6/plugins/platforms/*              \
-	/usr/lib/qt6/plugins/platformthemes/*         \
-	/usr/lib/qt6/plugins/platforminputcontexts/*  \
-	/usr/lib/qt6/plugins/styles/*                 \
-	/usr/lib/qt6/plugins/xcbglintegrations/*      \
-	/usr/lib/qt6/plugins/wayland-*/*              \
-	/usr/lib/pulseaudio/*                         \
-	/usr/lib/pipewire-*/*                         \
-	/usr/lib/spa-*/*/*                            \
-	/usr/lib/alsa-lib/*
-rm -f ./sharun-aio
+# ADD LIBRARIES
+wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
+chmod +x ./quick-sharun
+DEPLOY_OPENGL=1 DEPLOY_VULKAN=1 DEPLOY_PIPEWIRE=1 \
+	./quick-sharun /usr/bin/azahar* /usr/lib/libgamemode.so*
+ln ./AppDir/sharun ./AppDir/AppRun
 
-# Prepare sharun
-if [ "$ARCH" = 'aarch64' ]; then # allow using host vk for aarch64 given the sad situation
-	echo 'SHARUN_ALLOW_SYS_VKICD=1' >> ./.env
+# allow using host vk for aarch64 given the sad situation
+if [ "$ARCH" = 'aarch64' ]; then 
+	echo 'SHARUN_ALLOW_SYS_VKICD=1' >> ./AppDir/.env
 fi
-ln ./sharun ./AppRun
-./sharun -g
 
-# turn appdir into appimage
-cd ..
-wget -q "$URUNTIME" -O ./uruntime
-chmod +x ./uruntime
-
-#Add udpate info to runtime
-echo "Adding update information \"$UPINFO\" to runtime..."
-./uruntime --appimage-addupdinfo "$UPINFO"
-
-echo "Generating AppImage..."
-./uruntime --appimage-mkdwarfs -f        \
-	--set-owner 0 --set-group 0          \
-	--no-history --no-create-timestamp   \
-	--compression zstd:level=22 -S26 -B8 \
-	--header uruntime                    \
-	-i ./AppDir -o Azahar-Enhanced-"$VERSION"-anylinux-"$ARCH".AppImage
-
-echo "Generating zsync file..."
-zsyncmake *.AppImage -u *.AppImage
-echo "All Done!"
+# MAKE APPIMAGE WITH URUNTIME
+wget --retry-connrefused --tries=30 "$URUNTIME" -O ./uruntime2appimage
+chmod +x ./uruntime2appimage
+./uruntime2appimage
