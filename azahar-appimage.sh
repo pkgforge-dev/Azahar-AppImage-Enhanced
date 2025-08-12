@@ -35,9 +35,6 @@ else
 fi
 echo "$VERSION" > ~/version
 
-export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
-export OUTNAME=Azahar-Enhanced-"$VERSION"-anylinux-"$ARCH".AppImage
-
 # BUILD AZAAHR
 (
 	cd ./azahar
@@ -69,22 +66,26 @@ export OUTNAME=Azahar-Enhanced-"$VERSION"-anylinux-"$ARCH".AppImage
 )
 rm -rf ./azahar
 
-# PREPARE APPDIR
-mkdir ./AppDir
-cp -v /usr/share/applications/org.azahar_emu.Azahar.desktop            ./AppDir/azahar.desktop
-cp -v /usr/share/icons/hicolor/512x512/apps/org.azahar_emu.Azahar.png  ./AppDir/azahar.png
-cp -v /usr/share/icons/hicolor/512x512/apps/org.azahar_emu.Azahar.png  ./AppDir/.DirIcon
-if [ "$DEVEL" = 'true' ]; then
-	sed -i 's|Name=Azahar|Name=Azahar nightly|' ./AppDir/azahar.desktop
-	UPINFO="$(echo "$UPINFO" | sed 's|latest|nightly|')"
-fi
+# Deploy AppImage
+export ADD_HOOKS="self-updater.bg.hook"
+export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
+export OUTNAME=Azahar-Enhanced-"$VERSION"-anylinux-"$ARCH".AppImage
+export DESKTOP=/usr/share/applications/org.azahar_emu.Azahar.desktop
+export ICON=/usr/share/icons/hicolor/512x512/apps/org.azahar_emu.Azahar.png
+export DEPLOY_OPENGL=1 
+export DEPLOY_VULKAN=1 
+export DEPLOY_PIPEWIRE=1
 
 # ADD LIBRARIES
 wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
 chmod +x ./quick-sharun
-DEPLOY_OPENGL=1 DEPLOY_VULKAN=1 DEPLOY_PIPEWIRE=1 \
-	./quick-sharun /usr/bin/azahar* /usr/lib/libgamemode.so*
-ln ./AppDir/sharun ./AppDir/AppRun
+./quick-sharun /usr/bin/azahar* /usr/lib/libgamemode.so*
+
+# differentiate betwee dev and stable builds
+if [ "$DEVEL" = 'true' ]; then
+	sed -i 's|Name=Azahar|Name=Azahar nightly|' ./AppDir/azahar.desktop
+	UPINFO="$(echo "$UPINFO" | sed 's|latest|nightly|')"
+fi
 
 # allow using host vk for aarch64 given the sad situation
 if [ "$ARCH" = 'aarch64' ]; then 
