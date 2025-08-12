@@ -83,7 +83,7 @@ chmod +x ./quick-sharun
 
 # differentiate betwee dev and stable builds
 if [ "$DEVEL" = 'true' ]; then
-	sed -i 's|Name=Azahar|Name=Azahar nightly|' ./AppDir/azahar.desktop
+	sed -i 's|Name=Azahar|Name=Azahar nightly|' ./AppDir/*.desktop
 	UPINFO="$(echo "$UPINFO" | sed 's|latest|nightly|')"
 fi
 
