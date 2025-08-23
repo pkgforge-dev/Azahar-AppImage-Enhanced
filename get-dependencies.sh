@@ -1,111 +1,66 @@
 #!/bin/sh
 
 set -eux
-
-sed -i 's/DownloadUser/#DownloadUser/g' /etc/pacman.conf
-
-if [ "$(uname -m)" = 'x86_64' ]; then
-	PKG_TYPE='x86_64.pkg.tar.zst'
-else
-	PKG_TYPE='aarch64.pkg.tar.xz'
-fi
-
-LLVM_URL="https://github.com/pkgforge-dev/llvm-libs-debloated/releases/download/continuous/llvm-libs-mini-$PKG_TYPE"
-FFMPEG_URL="https://github.com/pkgforge-dev/llvm-libs-debloated/releases/download/continuous/ffmpeg-mini-$PKG_TYPE"
-QT6_URL="https://github.com/pkgforge-dev/llvm-libs-debloated/releases/download/continuous/qt6-base-iculess-$PKG_TYPE"
-LIBXML_URL="https://github.com/pkgforge-dev/llvm-libs-debloated/releases/download/continuous/libxml2-iculess-$PKG_TYPE"
-OPUS_URL="https://github.com/pkgforge-dev/llvm-libs-debloated/releases/download/continuous/opus-nano-$PKG_TYPE"
-MESA_URL="https://github.com/pkgforge-dev/llvm-libs-debloated/releases/download/continuous/mesa-mini-$PKG_TYPE"
+ARCH="$(uname -m)"
+EXTRA_PACKAGES="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
 
 echo "Installing build dependencies..."
 echo "---------------------------------------------------------------"
 pacman -Syu --noconfirm \
-	aom \
-	base-devel \
-	boost \
-	boost-libs \
-	catch2 \
-	clang \
-	cmake \
-	curl \
-	dav1d \
-	desktop-file-utils \
-	doxygen \
-	enet \
-	ffmpeg \
-	ffmpeg4.4 \
-	fmt \
-	gamemode \
-	git \
-	glslang \
-	glu \
-	graphviz \
-	hidapi \
-	libass \
-	libdecor \
-	libfdk-aac \
-	libinih \
-	libopusenc \
-	libva \
-	libvpx \
-	libxi \
-	libxkbcommon-x11 \
-	libxss \
-	libzip \
-	lld \
-	mbedtls \
-	mbedtls2 \
-	mesa \
-	meson \
-	nasm \
-	ninja \
-	nlohmann-json \
-	numactl \
-	pipewire-audio \
-	pulseaudio \
-	pulseaudio-alsa \
-	python-pip \
-	qt6-base \
-	qt6ct \
-	qt6-multimedia \
-	qt6-tools \
-	qt6-wayland \
-	rapidjson \
-	sdl2 \
-	spirv-headers \
-	unzip \
-	vulkan-headers \
-	vulkan-mesa-layers \
-	vulkan-nouveau \
-	vulkan-radeon \
-	wget \
-	x264 \
-	x265 \
-	xcb-util-cursor \
-	xcb-util-image \
-	xcb-util-renderutil \
-	xcb-util-wm \
-	xorg-server-xvfb \
-	zip \
+	base-devel           \
+	boost                \
+	boost-libs           \
+	catch2               \
+	clang                \
+	cmake                \
+	curl                 \
+	crypto++             \
+	doxygen              \
+	ffmpeg               \
+	fmt                  \
+	gamemode             \
+	git                  \
+	glslang              \
+	glu                  \
+	graphviz             \
+	hidapi               \
+	libinih              \
+	libvpx               \
+	libxi                \
+	libxkbcommon-x11     \
+	libxss               \
+	libzip               \
+	lld                  \
+	mesa                 \
+	meson                \
+	ninja                \
+	nlohmann-json        \
+	pipewire-audio       \
+	pulseaudio           \
+	pulseaudio-alsa      \
+	qt6-base             \
+	qt6ct                \
+	qt6-multimedia       \
+	qt6-tools            \
+	qt6-wayland          \
+	rapidjson            \
+	sdl2                 \
+	spirv-headers        \
+	unzip                \
+	vulkan-headers       \
+	vulkan-mesa-layers   \
+	wget                 \
+	xcb-util-cursor      \
+	xcb-util-image       \
+	xcb-util-renderutil  \
+	xcb-util-wm          \
+	xorg-server-xvfb     \
+	zip                  \
 	zsync
 
-if [ "$(uname -m)" = 'x86_64' ]; then
-	pacman -Syu --noconfirm vulkan-intel haskell-gnutls gcc14 svt-av1
-else
-	pacman -Syu --noconfirm vulkan-freedreno vulkan-panfrost
-fi
 
-
-echo "Installing debloated pckages..."
+echo "Installing debloated packages..."
 echo "---------------------------------------------------------------"
-wget --retry-connrefused --tries=30 "$LLVM_URL"   -O  ./llvm-libs.pkg.tar.zst
-wget --retry-connrefused --tries=30 "$QT6_URL"    -O  ./qt6-base-iculess.pkg.tar.zst
-wget --retry-connrefused --tries=30 "$LIBXML_URL" -O  ./libxml2-iculess.pkg.tar.zst
-wget --retry-connrefused --tries=30 "$FFMPEG_URL" -O  ./ffmpeg-mini.pkg.tar.zst
-wget --retry-connrefused --tries=30 "$OPUS_URL"   -O  ./opus-nano.pkg.tar.zst
-
-pacman -U --noconfirm ./*.pkg.tar.zst
-rm -f ./*.pkg.tar.zst
-
-echo "All done!"
-echo "---------------------------------------------------------------"
+wget --retry-connrefused --tries=30 "$EXTRA_PACKAGES" -O ./get-debloated-pkgs.sh
+chmod +x ./get-debloated-pkgs.sh
+./get-debloated-pkgs.sh --add-common
