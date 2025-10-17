@@ -44,6 +44,10 @@ echo "$VERSION" > ~/version
 	# HACK2
 	sed -i '1i find_package(SPIRV-Headers)' ./externals/sirit/sirit/src/CMakeLists.txt
 
+	# HACK3
+	qpaheader=$(find /usr/include -type f -name 'qplatformnativeinterface.h' -print -quit)
+	sed -i "s|#include <qpa/qplatformnativeinterface.h>|#include <$qpaheader>|" ./src/citra_qt/bootmanager.cpp
+
 	mkdir ./build
 	cd ./build
 	cmake .. -DCMAKE_CXX_COMPILER=clang++    \
@@ -85,11 +89,6 @@ chmod +x ./quick-sharun
 if [ "$DEVEL" = 'true' ]; then
 	sed -i 's|Name=Azahar|Name=Azahar nightly|' ./AppDir/*.desktop
 	UPINFO="$(echo "$UPINFO" | sed 's|latest|nightly|')"
-fi
-
-# allow using host vk for aarch64 given the sad situation
-if [ "$ARCH" = 'aarch64' ]; then 
-	echo 'SHARUN_ALLOW_SYS_VKICD=1' >> ./AppDir/.env
 fi
 
 # MAKE APPIMAGE WITH URUNTIME
