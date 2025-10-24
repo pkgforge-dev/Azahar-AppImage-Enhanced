@@ -62,10 +62,13 @@ echo "$VERSION" > ~/version
 		-DENABLE_LTO=OFF                     \
 		-DUSE_SYSTEM_GLSLANG=ON              \
 		-DCITRA_USE_PRECOMPILED_HEADERS=OFF  \
+		-DCMAKE_C_COMPILER_LAUNCHER=ccache   \
+		-DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
 		-DCMAKE_C_FLAGS="$ARCH_FLAGS"        \
 		-DCMAKE_CXX_FLAGS="$ARCH_FLAGS"      \
 		-Wno-dev
 	cmake --build . -- -j"$(nproc)"
+	ccache -s -v
 	sudo make install
 )
 rm -rf ./azahar
