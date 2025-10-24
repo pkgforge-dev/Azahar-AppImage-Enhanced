@@ -11,13 +11,13 @@ SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/h
 if [ "$1" = 'v3' ] && [ "$ARCH" = 'x86_64' ]; then
 	echo "Making x86-64-v3 optimized build of azahar..."
 	ARCH="${ARCH}_v3"
-	ARCH_FLAGS="-march=x86-64-v3 -O3 -flto=thin -DNDEBUG"
+	ARCH_FLAGS="-march=x86-64-v3 -O3 -flto=thin -fuse-ld=lld -DNDEBUG"
 elif [ "$ARCH" = 'x86_64' ]; then
 	echo "Making x86-64 generic build of azahar..."
-	ARCH_FLAGS="-march=x86-64 -mtune=generic -O3 -flto=thin -DNDEBUG"
+	ARCH_FLAGS="-march=x86-64 -mtune=generic -O3 -flto=thin -fuse-ld=lld -DNDEBUG"
 else
 	echo "Making aarch64 build of azahar..."
-	ARCH_FLAGS="-march=armv8-a -mtune=generic -O3 -flto=thin -DNDEBUG"
+	ARCH_FLAGS="-march=armv8-a -mtune=generic -O3 -flto=thin -fuse-ld=lld -DNDEBUG"
 fi
 
 # Determine to build nightly or stable
