@@ -11,6 +11,7 @@ pacman -Syu --noconfirm \
 	boost                \
 	boost-libs           \
 	catch2               \
+	ccache               \
 	clang                \
 	cmake                \
 	curl                 \
