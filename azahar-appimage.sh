@@ -11,13 +11,13 @@ SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/h
 if [ "$1" = 'v3' ] && [ "$ARCH" = 'x86_64' ]; then
 	echo "Making x86-64-v3 optimized build of azahar..."
 	ARCH="${ARCH}_v3"
-	ARCH_FLAGS="-march=x86-64-v3 -O3 -flto=thin -DNDEBUG"
+	ARCH_FLAGS="-march=x86-64-v3 -O3 -flto=thin -fuse-ld=lld -DNDEBUG"
 elif [ "$ARCH" = 'x86_64' ]; then
 	echo "Making x86-64 generic build of azahar..."
-	ARCH_FLAGS="-march=x86-64 -mtune=generic -O3 -flto=thin -DNDEBUG"
+	ARCH_FLAGS="-march=x86-64 -mtune=generic -O3 -flto=thin -fuse-ld=lld -DNDEBUG"
 else
 	echo "Making aarch64 build of azahar..."
-	ARCH_FLAGS="-march=armv8-a -mtune=generic -O3 -flto=thin -DNDEBUG"
+	ARCH_FLAGS="-march=armv8-a -mtune=generic -O3 -flto=thin -fuse-ld=lld -DNDEBUG"
 fi
 
 # Determine to build nightly or stable
@@ -48,25 +48,29 @@ echo "$VERSION" > ~/version
 	qpaheader=$(find /usr/include -type f -name 'qplatformnativeinterface.h' -print -quit)
 	sed -i "s|#include <qpa/qplatformnativeinterface.h>|#include <$qpaheader>|" ./src/citra_qt/bootmanager.cpp
 
-	mkdir ./build
+	mkdir -p ./build
 	cd ./build
-	cmake .. -DCMAKE_CXX_COMPILER=clang++    \
+	cmake .. -G Ninja                        \
+		-DCMAKE_CXX_COMPILER=clang++         \
 		-DCMAKE_C_COMPILER=clang             \
 		-DCMAKE_INSTALL_PREFIX=/usr          \
 		-DENABLE_QT_TRANSLATION=ON           \
 		-DUSE_SYSTEM_BOOST=OFF               \
 		-DCMAKE_BUILD_TYPE=Release           \
-		-DUSE_DISCORD_PRESENCE=OFF           \
-		-DCMAKE_C_FLAGS="$ARCH_FLAGS"        \
 		-DUSE_SYSTEM_VULKAN_HEADERS=ON       \
 		-DENABLE_LTO=OFF                     \
+		-DENABLE_TESTS=OFF                   \
+		-DENABLE_ROOM_STANDALONE=OFF         \
 		-DUSE_SYSTEM_GLSLANG=ON              \
 		-DCITRA_USE_PRECOMPILED_HEADERS=OFF  \
+		-DCMAKE_C_COMPILER_LAUNCHER=ccache   \
+		-DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
 		-DCMAKE_C_FLAGS="$ARCH_FLAGS"        \
 		-DCMAKE_CXX_FLAGS="$ARCH_FLAGS"      \
 		-Wno-dev
-	cmake --build . -- -j"$(nproc)"
-	sudo make install
+	ninja
+	sudo ninja install
+	ccache -s -v
 )
 rm -rf ./azahar
 

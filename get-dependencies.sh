@@ -11,6 +11,7 @@ pacman -Syu --noconfirm \
 	boost                \
 	boost-libs           \
 	catch2               \
+	ccache               \
 	clang                \
 	cmake                \
 	curl                 \
@@ -31,6 +32,7 @@ pacman -Syu --noconfirm \
 	libxss               \
 	libzip               \
 	lld                  \
+	llvm                 \
 	mesa                 \
 	meson                \
 	ninja                \
