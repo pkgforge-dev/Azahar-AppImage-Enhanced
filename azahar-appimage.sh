@@ -56,8 +56,6 @@ echo "$VERSION" > ~/version
 		-DENABLE_QT_TRANSLATION=ON           \
 		-DUSE_SYSTEM_BOOST=OFF               \
 		-DCMAKE_BUILD_TYPE=Release           \
-		-DUSE_DISCORD_PRESENCE=OFF           \
-		-DCMAKE_C_FLAGS="$ARCH_FLAGS"        \
 		-DUSE_SYSTEM_VULKAN_HEADERS=ON       \
 		-DENABLE_LTO=OFF                     \
 		-DENABLE_TESTS=OFF                   \
