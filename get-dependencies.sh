@@ -31,6 +31,7 @@ pacman -Syu --noconfirm \
 	libxss               \
 	libzip               \
 	lld                  \
+	llvm                 \
 	mesa                 \
 	meson                \
 	ninja                \
