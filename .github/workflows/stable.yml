@@ -1,6 +1,6 @@
 name: Appimage
 concurrency:
-  group: build-${{ github.ref }}
+  group: build-stable-${{ github.ref }}
   cancel-in-progress: true
 
 on:
@@ -28,6 +28,10 @@ jobs:
             optimized: false
             arch: aarch64
     container: ghcr.io/pkgforge-dev/archlinux:latest
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_COMPILERCHECK: content
+      CCACHE_SLOPPINESS: time_macros
     steps:
       - uses: actions/checkout@v4
         with:
@@ -36,6 +40,14 @@ jobs:
       - name: Install dependencies
         if: always()
         run: chmod +x ./get-dependencies.sh && ./get-dependencies.sh
+
+      - name: Restore ccache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ${{ matrix.runs-on }}-ccache-stable-${{ matrix.optimized }}-${{ github.sha }}
+          restore-keys: |
+            ${{ matrix.runs-on }}-ccache-stable-${{ matrix.optimized }}-
 
       - name: Compile Azahar (Normal)
         if: ${{ matrix.optimized == false }}
