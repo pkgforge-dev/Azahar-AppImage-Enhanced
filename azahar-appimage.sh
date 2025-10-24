@@ -48,9 +48,10 @@ echo "$VERSION" > ~/version
 	qpaheader=$(find /usr/include -type f -name 'qplatformnativeinterface.h' -print -quit)
 	sed -i "s|#include <qpa/qplatformnativeinterface.h>|#include <$qpaheader>|" ./src/citra_qt/bootmanager.cpp
 
-	mkdir ./build
+	mkdir -p ./build
 	cd ./build
-	cmake .. -DCMAKE_CXX_COMPILER=clang++    \
+	cmake .. -G Ninja                        \
+		-DCMAKE_CXX_COMPILER=clang++         \
 		-DCMAKE_C_COMPILER=clang             \
 		-DCMAKE_INSTALL_PREFIX=/usr          \
 		-DENABLE_QT_TRANSLATION=ON           \
@@ -67,9 +68,9 @@ echo "$VERSION" > ~/version
 		-DCMAKE_C_FLAGS="$ARCH_FLAGS"        \
 		-DCMAKE_CXX_FLAGS="$ARCH_FLAGS"      \
 		-Wno-dev
-	cmake --build . -- -j"$(nproc)"
+	ninja
+	sudo ninja install
 	ccache -s -v
-	sudo make install
 )
 rm -rf ./azahar
 
