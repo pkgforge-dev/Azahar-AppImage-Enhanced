@@ -60,6 +60,8 @@ echo "$VERSION" > ~/version
 		-DCMAKE_C_FLAGS="$ARCH_FLAGS"        \
 		-DUSE_SYSTEM_VULKAN_HEADERS=ON       \
 		-DENABLE_LTO=OFF                     \
+		-DENABLE_TESTS=OFF                   \
+		-DENABLE_ROOM_STANDALONE=OFF         \
 		-DUSE_SYSTEM_GLSLANG=ON              \
 		-DCITRA_USE_PRECOMPILED_HEADERS=OFF  \
 		-DCMAKE_C_COMPILER_LAUNCHER=ccache   \
