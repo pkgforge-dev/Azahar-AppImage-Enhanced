@@ -75,6 +75,7 @@ echo "$VERSION" > ~/version
 rm -rf ./azahar
 
 # Deploy AppImage
+export OUTPUT_APPIMAGE=1
 export ADD_HOOKS="self-updater.bg.hook"
 export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
 export OUTNAME=Azahar-Enhanced-"$VERSION"-anylinux-"$ARCH".AppImage
@@ -84,18 +85,13 @@ export DEPLOY_OPENGL=1
 export DEPLOY_VULKAN=1 
 export DEPLOY_PIPEWIRE=1
 
+# differentiate betwee dev and stable builds
+if [ "$DEVEL" = 'true' ]; then
+	sed -i 's|Name=Azahar|Name=Azahar nightly|' "$DESKTOP"
+	UPINFO="$(echo "$UPINFO" | sed 's|latest|nightly|')"
+fi
+
 # ADD LIBRARIES
 wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
 chmod +x ./quick-sharun
 ./quick-sharun /usr/bin/azahar* /usr/lib/libgamemode.so*
-
-# differentiate betwee dev and stable builds
-if [ "$DEVEL" = 'true' ]; then
-	sed -i 's|Name=Azahar|Name=Azahar nightly|' ./AppDir/*.desktop
-	UPINFO="$(echo "$UPINFO" | sed 's|latest|nightly|')"
-fi
-
-# MAKE APPIMAGE WITH URUNTIME
-wget --retry-connrefused --tries=30 "$URUNTIME" -O ./uruntime2appimage
-chmod +x ./uruntime2appimage
-./uruntime2appimage
