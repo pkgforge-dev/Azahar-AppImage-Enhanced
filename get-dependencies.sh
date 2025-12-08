@@ -44,7 +44,6 @@ pacman -Syu --noconfirm \
 	qt6ct                \
 	qt6-multimedia       \
 	qt6-tools            \
-	qt6-wayland          \
 	rapidjson            \
 	sdl2                 \
 	spirv-headers        \
