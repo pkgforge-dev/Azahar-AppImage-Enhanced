@@ -111,4 +111,3 @@ cmake ../ -G Ninja \
 
 ninja
 sudo ninja install
-ccache -s -v
