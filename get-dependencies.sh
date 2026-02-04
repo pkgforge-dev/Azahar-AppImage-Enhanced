@@ -60,9 +60,9 @@ echo "---------------------------------------------------------------"
 REPO="https://github.com/azahar-emu/azahar.git"
 
 case "$ARCH" in
-	x86_64)  set -- -march=x86-64-v3 -O3;;
-	aarch64) set -- -march=armv8-a -mtune=generic -O3;;
-	*)       >&2 echo "ERROR: Unkown arch: $ARCH"; exit 1;;
+	x86_64)  set -- -march=x86-64-v3 -O3 -flto=thin -fuse-ld=lld -DNDEBUG;;
+	aarch64) set -- -march=armv8-a -mtune=generic -O3 -flto=thin -fuse-ld=lld -DNDEBUG;;
+	*)       >&2 echo "ERROR: Unknown arch: $ARCH"; exit 1;;
 esac
 
 git clone --recursive "$REPO" ./azahar
@@ -90,7 +90,8 @@ sed -i "s|#include <qpa/qplatformnativeinterface.h>|#include <$qpaheader>|" ./sr
 mkdir -p ./build
 cd ./build
 
-cmake ../ -G Ninja \
+cmake ../ \
+	-G Ninja                             \
 	-DCMAKE_CXX_COMPILER=clang++         \
 	-DCMAKE_C_COMPILER=clang             \
 	-DCMAKE_INSTALL_PREFIX=/usr          \
