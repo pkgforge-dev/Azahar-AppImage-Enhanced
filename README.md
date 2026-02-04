@@ -15,7 +15,7 @@
 | :---: | :---: | :---: |
 | [Click here](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced/releases/latest) | [Click here](https://github.com/pkgforge-dev/Azahar-AppImage-Enhanced/releases/tag/nightly) | [Click here](https://github.com/azahar-emu/azahar) |
 
-Improved AppImage of cemu **independent of the host libc** which makes able to work on very very old distros as well as musl-libc distros like alpine linux. It is also **optimized for `x86-64-v3`** cpus giving a performance boost. 
+Improved AppImage of Azahar **independent of the host libc** which makes able to work on very very old distros as well as musl-libc distros like alpine linux. It is also **optimized for `x86-64-v3`** cpus giving a performance boost. 
 
 </div>
 
