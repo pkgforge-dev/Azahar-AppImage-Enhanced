@@ -4,6 +4,7 @@ set -eu
 
 ARCH=$(uname -m)
 export ARCH
+export OUTPATH=./dist
 export ADD_HOOKS="self-updater.bg.hook:x86-64-v3-check.hook"
 export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
 export APPNAME=Azahar
