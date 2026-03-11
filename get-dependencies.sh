@@ -20,6 +20,7 @@ pacman -Syu --noconfirm \
 	glu                  \
 	graphviz             \
 	hidapi               \
+	kvantum              \
 	libinih              \
 	libvpx               \
 	libxi                \
@@ -30,6 +31,7 @@ pacman -Syu --noconfirm \
 	meson                \
 	ninja                \
 	nlohmann-json        \
+	lxqt-qtplugin        \
 	pipewire-audio       \
 	pipewire-jack        \
 	pulseaudio           \
